@@ -14,6 +14,11 @@ const logger = (req, res, next) => {
     return next(); 
   }
   
+  const timeStamp = new Date();
+  const dateString = timeStamp.toISOString().split("T")[0]; // Obtiene "YYYY-MM-DD"
+  const logFileName = `log-${dateString}.json`; // Archivo de logs por día
+
+
   const logEntry = {
     timeStamp: new Date().toISOString(),
     method: req.method,
@@ -32,7 +37,7 @@ const logger = (req, res, next) => {
 
   logs.push(logEntry);
 
-  fs.writeFileSync("log.json", JSON.stringify(logs, null, 2));
+  fs.writeFileSync(logFileName, JSON.stringify(logs, null, 2));
 
   console.log("Registro guardado para:", req.url)
 
