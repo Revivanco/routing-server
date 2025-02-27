@@ -8,12 +8,12 @@ const PORT = 3000; // Puerto donde correrá el servidor
 
 //Esta funcion consologuea la fecha, la hora, el metodo y la url
 const logger = (req, res, next) => {
-  const staticExtensions = [".css",".js"]
+  const staticExtensions = [".css", ".js"]
   const ext = path.extname(req.url)
   if (staticExtensions.includes(ext)) {
-    return next(); 
+    return next();
   }
-  
+
   const timeStamp = new Date();
   const dateString = timeStamp.toISOString().split("T")[0]; // Obtiene "YYYY-MM-DD"
   const logFileName = `log-${dateString}.json`; // Archivo de logs por día
@@ -24,18 +24,21 @@ const logger = (req, res, next) => {
     method: req.method,
     url: req.url
   };
-  
+
   console.log("Reggistrando visita a:", req.url)
 
-  let logs = [];
-  if (fs.existsSync("log.json")) {
-    const data = fs.readFileSync("log.json", "utf8")
-    if(data){
+  let logs = { visitCount: 0, entries: [] };
+
+  if (fs.existsSync(logFileName)) {
+    const data = fs.readFileSync(logFileName, "utf8")
+    if (data) {
       logs = JSON.parse(data)
     }
   };
 
-  logs.push(logEntry);
+  logs.visitCount += 1; // Incrementa el contador de visitas
+  logs.entries.push(logEntry);
+
 
   fs.writeFileSync(logFileName, JSON.stringify(logs, null, 2));
 
@@ -68,7 +71,6 @@ app.get("/segunda", (req, res) => {
   console.log("Sirviendo Secundaria")
   res.sendFile(path.join(__dirname, "public", "segunda", "index.html"));
 });
-
 
 
 // Iniciar el servidor
